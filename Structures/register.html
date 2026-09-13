@@ -390,7 +390,6 @@
       }
 
       /* Tablet & Mobile Responsiveness (< 768px) */
-      /* Tablet & Mobile Responsiveness (< 768px) */
       @media (max-width: 768px) {
         body {
           padding: 8px;
@@ -407,7 +406,6 @@
           position: relative;
         }
 
-        /* Make toggle container sit cleanly at the top or bottom instead of overlapping */
         .toggle-container {
           position: relative;
           left: 0;
@@ -450,7 +448,6 @@
           display: none;
         }
 
-        /* Show the active toggle panel state cleanly */
         .toggle-left {
           display: flex;
         }
@@ -493,7 +490,6 @@
           margin: 0;
         }
 
-        /* Form Area */
         .form-container {
           position: relative;
           width: 100%;
@@ -870,8 +866,6 @@
     </div>
 
     <script>
-      const API_URL = "http://localhost:5000/api";
-
       const container = document.getElementById("container");
       const consulteeSignUpBtn = document.getElementById(
         "consultee-signup-btn"
@@ -905,6 +899,17 @@
       const resetModal = document.getElementById("reset-modal");
       const closeResetModal = document.getElementById("close-reset-modal");
       const resetRoleSelect = document.getElementById("reset-role");
+
+      // Helper: Get users list from localStorage
+      function getUsers() {
+        const stored = localStorage.getItem("platform_users");
+        return stored ? JSON.parse(stored) : [];
+      }
+
+      // Helper: Save users list to localStorage
+      function saveUsers(users) {
+        localStorage.setItem("platform_users", JSON.stringify(users));
+      }
 
       function getInitials(name) {
         if (!name) return "U";
@@ -995,29 +1000,29 @@
 
       document
         .getElementById("reset-password-form")
-        .addEventListener("submit", async (e) => {
+        .addEventListener("submit", (e) => {
           e.preventDefault();
           const role = resetRoleSelect.value;
           const email = document.getElementById("reset-email").value.trim();
           const newPassword =
             document.getElementById("reset-new-password").value;
 
-          try {
-            const res = await fetch(`${API_URL}/reset-password`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email, role, newPassword }),
-            });
-            const data = await res.json();
+          const users = getUsers();
+          const userIndex = users.findIndex(
+            (u) => u.email === email && u.role === role
+          );
 
-            if (!res.ok) throw new Error(data.message);
-
-            alert(data.message);
-            resetModal.style.display = "none";
-            document.getElementById("reset-password-form").reset();
-          } catch (err) {
-            alert(err.message);
+          if (userIndex === -1) {
+            alert("No account found with that email and role.");
+            return;
           }
+
+          users[userIndex].password = newPassword;
+          saveUsers(users);
+
+          alert("Password successfully updated!");
+          resetModal.style.display = "none";
+          document.getElementById("reset-password-form").reset();
         });
 
       // Consultee Registration
@@ -1026,13 +1031,20 @@
         .addEventListener("submit", async (e) => {
           e.preventDefault();
           const name = document.getElementById("cs-name").value.trim();
+          const email = document.getElementById("cs-email").value.trim();
           const file = document.getElementById("cs-image").files[0];
           const profileImage = file ? await getBase64(file) : "";
 
-          const payload = {
+          const users = getUsers();
+          if (users.some((u) => u.email === email && u.role === "consultee")) {
+            alert("Consultee email already registered.");
+            return;
+          }
+
+          const newUser = {
             role: "consultee",
             name,
-            email: document.getElementById("cs-email").value.trim(),
+            email,
             phone: document.getElementById("cs-phone").value,
             profession: document.getElementById("cs-profession").value,
             interest: document.getElementById("cs-interest").value,
@@ -1041,22 +1053,12 @@
             password: document.getElementById("cs-password").value,
           };
 
-          try {
-            const res = await fetch(`${API_URL}/register`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message);
+          users.push(newUser);
+          saveUsers(users);
 
-            localStorage.setItem("currentUser", JSON.stringify(data.user));
-            alert("Consultee registration successful!");
-            window.location.href =
-              "../Structures/dashboard.html";
-          } catch (err) {
-            alert(err.message);
-          }
+          localStorage.setItem("currentUser", JSON.stringify(newUser));
+          alert("Consultee registration successful!");
+          window.location.href = "../Structures/dashboard.html";
         });
 
       // Consultant Registration
@@ -1065,13 +1067,20 @@
         .addEventListener("submit", async (e) => {
           e.preventDefault();
           const name = document.getElementById("cn-name").value.trim();
+          const email = document.getElementById("cn-email").value.trim();
           const file = document.getElementById("cn-image").files[0];
           const profileImage = file ? await getBase64(file) : "";
 
-          const payload = {
+          const users = getUsers();
+          if (users.some((u) => u.email === email && u.role === "consultant")) {
+            alert("Consultant email already registered.");
+            return;
+          }
+
+          const newUser = {
             role: "consultant",
             name,
-            email: document.getElementById("cn-email").value.trim(),
+            email,
             profession: document.getElementById("cn-expertise").value,
             expertise: document.getElementById("cn-expertise").value,
             experience: document.getElementById("cn-exp").value,
@@ -1081,22 +1090,12 @@
             password: document.getElementById("cn-password").value,
           };
 
-          try {
-            const res = await fetch(`${API_URL}/register`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message);
+          users.push(newUser);
+          saveUsers(users);
 
-            localStorage.setItem("currentUser", JSON.stringify(data.user));
-            alert("Consultant registration successful!");
-            window.location.href =
-              "../Structures/consultant.html";
-          } catch (err) {
-            alert(err.message);
-          }
+          localStorage.setItem("currentUser", JSON.stringify(newUser));
+          alert("Consultant registration successful!");
+          window.location.href = "../Structures/consultant.html";
         });
 
       // Admin Registration
@@ -1113,57 +1112,52 @@
           }
 
           const name = document.getElementById("adsu-name").value.trim();
+          const email = document.getElementById("adsu-email").value.trim();
           const file = document.getElementById("adsu-image").files[0];
           const profileImage = file ? await getBase64(file) : "";
 
-          const payload = {
+          const users = getUsers();
+          if (users.some((u) => u.email === email && u.role === "admin")) {
+            alert("Admin email already registered.");
+            return;
+          }
+
+          const newUser = {
             role: "admin",
             name,
-            email: document.getElementById("adsu-email").value.trim(),
+            email,
             profession: "System Administrator",
             initials: getInitials(name),
             profileImage,
             password: document.getElementById("adsu-password").value,
           };
 
-          try {
-            const res = await fetch(`${API_URL}/register`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message);
+          users.push(newUser);
+          saveUsers(users);
 
-            localStorage.setItem("currentUser", JSON.stringify(data.user));
-            alert("Admin account successfully created!");
-            window.location.href =
-              "../Structures/admin.html";
-          } catch (err) {
-            alert(err.message);
-          }
+          localStorage.setItem("currentUser", JSON.stringify(newUser));
+          alert("Admin account successfully created!");
+          window.location.href = "../Structures/admin.html";
         });
 
-      // Generic Login Handler
-      async function handleLogin(emailId, passwordId, role, redirectUrl) {
-        const email = document.getElementById(emailId).value.trim();
+      // Generic Login Handler using LocalStorage
+      function handleLogin(emailId, passwordId, role, redirectUrl) {
+        const emailOrKey = document.getElementById(emailId).value.trim();
         const password = document.getElementById(passwordId).value;
 
-        try {
-          const res = await fetch(`${API_URL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password, role }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.message);
+        const users = getUsers();
+        const user = users.find(
+          (u) => (u.email === emailOrKey || u.name === emailOrKey) && u.role === role
+        );
 
-          localStorage.setItem("currentUser", JSON.stringify(data.user));
-          alert(`Welcome back, ${data.user.name}!`);
-          window.location.href = redirectUrl;
-        } catch (err) {
-          alert(err.message);
+        if (!user || user.password !== password) {
+          alert("Invalid email/identifier or password.");
+          return;
         }
+
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        alert(`Welcome back, ${user.name}!`);
+        window.location.href = redirectUrl;
       }
 
       // Sign-In Submissions
