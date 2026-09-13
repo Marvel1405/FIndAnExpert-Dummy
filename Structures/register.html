@@ -1030,7 +1030,7 @@
             localStorage.setItem("currentUser", JSON.stringify(data.user));
             alert("Consultee registration successful!");
             window.location.href =
-              "http://127.0.0.1:5500/Structures/dashboard.html";
+              "./Structure/dashboard.html";
           } catch (err) {
             alert(err.message);
           }
@@ -1070,7 +1070,7 @@
             localStorage.setItem("currentUser", JSON.stringify(data.user));
             alert("Consultant registration successful!");
             window.location.href =
-              "http://127.0.0.1:5500/Structures/consultant.html";
+              "./Structures/consultant.html";
           } catch (err) {
             alert(err.message);
           }
@@ -1115,7 +1115,7 @@
             localStorage.setItem("currentUser", JSON.stringify(data.user));
             alert("Admin account successfully created!");
             window.location.href =
-              "http://127.0.0.1:5500/Structures/admin.html";
+              "./Structure/admin.html";
           } catch (err) {
             alert(err.message);
           }
@@ -1150,7 +1150,7 @@
           "si-email",
           "si-password",
           "consultee",
-          "http://127.0.0.1:5500/Structures/dashboard.html"
+          "./Structures/dashboard.html"
         );
       });
 
@@ -1162,7 +1162,7 @@
             "cnsi-email",
             "cnsi-password",
             "consultant",
-            "http://127.0.0.1:5500/Structures/consultant.html"
+            "./Structures/consultant.html"
           );
         });
 
@@ -1174,7 +1174,7 @@
             "ad-email",
             "ad-password",
             "admin",
-            "http://127.0.0.1:5500/Structures/admin.html"
+            "./Structures/admin.html"
           );
         });
     </script>
