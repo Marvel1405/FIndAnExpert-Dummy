@@ -1042,7 +1042,7 @@
           saveUsers(users);
           localStorage.setItem("currentUser", JSON.stringify(newUser));
           alert("Consultee registration successful!");
-          window.location.href = "./Structure/dashboard.html";
+          window.location.href = "../Structure/dashboard.html";
         });
 
       // Consultant Registration
@@ -1081,7 +1081,7 @@
           saveUsers(users);
           localStorage.setItem("currentUser", JSON.stringify(newUser));
           alert("Consultant registration successful!");
-          window.location.href = "./Structures/consultant.html";
+          window.location.href = "../Structures/consultant.html";
         });
 
       // Admin Registration
@@ -1125,7 +1125,7 @@
           saveUsers(users);
           localStorage.setItem("currentUser", JSON.stringify(newUser));
           alert("Admin account successfully created!");
-          window.location.href = "./Structure/admin.html";
+          window.location.href = "../Structure/admin.html";
         });
 
       // Generic Login Handler via localStorage
@@ -1161,7 +1161,7 @@
           "si-email",
           "si-password",
           "consultee",
-          "./Structures/dashboard.html"
+          "../Structures/dashboard.html"
         );
       });
 
@@ -1173,7 +1173,7 @@
             "cnsi-email",
             "cnsi-password",
             "consultant",
-            "./Structures/consultant.html"
+            "../Structures/consultant.html"
           );
         });
 
@@ -1185,7 +1185,7 @@
             "ad-email",
             "ad-password",
             "admin",
-            "./Structures/admin.html"
+            "../Structures/admin.html"
           );
         });
     </script>
