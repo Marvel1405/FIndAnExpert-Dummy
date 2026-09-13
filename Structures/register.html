@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In / Sign Up Form</title>
+    <link rel="icon" type="image/jpeg" href="../Public/icon.PNG" />
+    <style>
+      :root {
+        --bg: #fdfbf7;
+        --card: #fdfbf7;
+        --text: #222;
+        --primary: #2563eb;
+      }
+
+      .dark {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --text: white;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: #0f172a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        background-color: var(--card);
+        border-radius: 20px;
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25);
+        position: relative;
+        overflow: hidden;
+        width: 768px;
+        max-width: 100%;
+        min-height: 540px;
+      }
+
+      .card-logo {
+        position: absolute;
+        top: 15px;
+        left: 20px;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+      }
+
+      .card-logo img {
+        height: 32px;
+        width: auto;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+      }
+
+      .card-logo img:hover {
+        transform: scale(1.05);
+      }
+
+      .admin-trigger {
+        position: absolute;
+        bottom: 15px;
+        left: 20px;
+        z-index: 2000;
+        opacity: 0.2;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+      }
+
+      .admin-trigger:hover {
+        opacity: 0.9;
+      }
+
+      .admin-trigger svg {
+        width: 18px;
+        height: 18px;
+        fill: #475569;
+      }
+
+      .form-container {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        transition: all 0.6s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 40px 20px;
+        text-align: center;
+        overflow-y: auto;
+      }
+
+      .form-container::-webkit-scrollbar {
+        width: 4px;
+      }
+      .form-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+
+      .form-container form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .sign-in-container,
+      .consultee-signup-container,
+      .consultant-signup-container,
+      .consultant-signin-container,
+      .admin-signin-container,
+      .admin-signup-container {
+        left: 0;
+        width: 50%;
+        opacity: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .sign-in-container {
+        opacity: 1;
+        z-index: 2;
+        pointer-events: all;
+      }
+
+      .container.active-consultee-signup .sign-in-container,
+      .container.active-consultant-signup .sign-in-container,
+      .container.active-consultant-signin .sign-in-container,
+      .container.active-admin-signin .sign-in-container,
+      .container.active-admin-signup .sign-in-container {
+        transform: translateX(100%);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .container.active-consultee-signup .consultee-signup-container,
+      .container.active-consultant-signup .consultant-signup-container,
+      .container.active-consultant-signin .consultant-signin-container,
+      .container.active-admin-signin .admin-signin-container,
+      .container.active-admin-signup .admin-signup-container {
+        transform: translateX(100%);
+        opacity: 1;
+        z-index: 5;
+        pointer-events: all;
+        animation: move 0.6s;
+      }
+
+      @keyframes move {
+        0%,
+        49.99% {
+          opacity: 0;
+          z-index: 1;
+        }
+        50%,
+        100% {
+          opacity: 1;
+          z-index: 5;
+        }
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+      }
+
+      .social-icons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+      }
+
+      .social-icons a {
+        border: 1.5px solid var(--text);
+        border-radius: 8px;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        color: #333;
+        font-size: 12px;
+      }
+
+      span {
+        font-size: 11px;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+
+      input,
+      select {
+        background-color: var(--card);
+        border: solid 1.5px #0f172a;
+        padding: 9px 12px;
+        margin: 4px 0;
+        width: 100%;
+        border-radius: 8px;
+        outline: none;
+        color: var(--text);
+        font-size: 12px;
+      }
+
+      .file-label {
+        font-size: 10px;
+        color: #64748b;
+        align-self: flex-start;
+        margin-top: 4px;
+      }
+
+      .forgot-pass,
+      .toggle-link {
+        color: var(--primary);
+        font-size: 11px;
+        text-decoration: none;
+        margin: 6px 0;
+        cursor: pointer;
+      }
+
+      button {
+        background-color: var(--primary);
+        color: #fff;
+        font-size: 11px;
+        padding: 10px 20px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: transform 80ms ease-in;
+        margin-top: 6px;
+      }
+
+      button:active {
+        transform: scale(0.95);
+      }
+
+      button.btn-outline {
+        background-color: transparent;
+        border-color: #fff;
+        margin: 3px;
+        width: 100%;
+      }
+
+      .toggle-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
+        align-items: center;
+      }
+
+      .toggle-container {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 50%;
+        height: 100%;
+        overflow: hidden;
+        transition: all 0.6s ease-in-out;
+        border-radius: 25px 0 0 25px;
+        z-index: 1000;
+      }
+
+      .container.active-consultee-signup .toggle-container,
+      .container.active-consultant-signup .toggle-container,
+      .container.active-consultant-signin .toggle-container,
+      .container.active-admin-signin .toggle-container,
+      .container.active-admin-signup .toggle-container {
+        transform: translateX(-100%);
+        border-radius: 0 25px 25px 0;
+      }
+
+      .toggle {
+        background-color: var(--primary);
+        color: #fff;
+        position: relative;
+        left: -100%;
+        height: 100%;
+        width: 200%;
+        transform: translateX(0);
+        transition: all 0.6s ease-in-out;
+      }
+
+      .container.active-consultee-signup .toggle,
+      .container.active-consultant-signup .toggle,
+      .container.active-consultant-signin .toggle,
+      .container.active-admin-signin .toggle,
+      .container.active-admin-signup .toggle {
+        transform: translateX(50%);
+      }
+
+      .toggle-panel {
+        position: absolute;
+        width: 50%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 30px;
+        text-align: center;
+        top: 0;
+        transition: all 0.6s ease-in-out;
+      }
+
+      .toggle-left {
+        transform: translateX(-200%);
+      }
+
+      .container.active-consultee-signup .toggle-left,
+      .container.active-consultant-signup .toggle-left,
+      .container.active-consultant-signin .toggle-left,
+      .container.active-admin-signin .toggle-left,
+      .container.active-admin-signup .toggle-left {
+        transform: translateX(0);
+      }
+
+      .toggle-right {
+        right: 0;
+        transform: translateX(0);
+      }
+
+      .container.active-consultee-signup .toggle-right,
+      .container.active-consultant-signup .toggle-right,
+      .container.active-consultant-signin .toggle-right,
+      .container.active-admin-signin .toggle-right,
+      .container.active-admin-signup .toggle-right {
+        transform: translateX(200%);
+      }
+
+      .toggle-panel p {
+        font-size: 12px;
+        margin-bottom: 10px;
+        line-height: 1.4;
+      }
+
+      /* Forgot Password Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(15, 23, 42, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+      }
+
+      .modal-card {
+        background-color: var(--card);
+        padding: 30px;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        position: relative;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 12px;
+        right: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #64748b;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          width: 100%;
+          min-height: 580px;
+        }
+        .form-container {
+          padding: 35px 25px 15px;
+        }
+        h1 {
+          font-size: 1.3rem;
+        }
+      }
+
+      @media (max-width: 425px) {
+        body {
+          padding: 10px;
+        }
+
+        .container {
+          min-height: 620px;
+          border-radius: 16px;
+        }
+
+        .card-logo {
+          top: 10px;
+          left: 12px;
+        }
+
+        .card-logo img {
+          height: 24px;
+        }
+
+        .admin-trigger {
+          bottom: 10px;
+          left: 12px;
+        }
+
+        .form-container {
+          width: 100%;
+          height: 68%;
+          top: auto;
+          padding: 35px 15px 15px;
+        }
+
+        .sign-in-container,
+        .consultee-signup-container,
+        .consultant-signup-container,
+        .consultant-signin-container,
+        .admin-signin-container,
+        .admin-signup-container {
+          width: 100%;
+          left: 0;
+        }
+
+        .toggle-container {
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 32%;
+          border-radius: 0 0 30px 30px;
+        }
+
+        .container.active-consultee-signup .toggle-container,
+        .container.active-consultant-signup .toggle-container,
+        .container.active-consultant-signin .toggle-container,
+        .container.active-admin-signin .toggle-container,
+        .container.active-admin-signup .toggle-container {
+          transform: translateY(212%);
+          border-radius: 30px 30px 0 0;
+        }
+
+        .toggle {
+          left: 0;
+          top: -100%;
+          width: 100%;
+          height: 200%;
+          transform: translateY(0);
+        }
+
+        .container.active-consultee-signup .toggle,
+        .container.active-consultant-signup .toggle,
+        .container.active-consultant-signin .toggle,
+        .container.active-admin-signin .toggle,
+        .container.active-admin-signup .toggle {
+          transform: translateY(50%);
+        }
+
+        .toggle-panel {
+          width: 100%;
+          height: 50%;
+          padding: 0 15px;
+        }
+
+        .toggle-left {
+          transform: translateY(-200%);
+        }
+        .container.active-consultee-signup .toggle-left,
+        .container.active-consultant-signup .toggle-left,
+        .container.active-consultant-signin .toggle-left,
+        .container.active-admin-signin .toggle-left,
+        .container.active-admin-signup .toggle-left {
+          transform: translateY(0);
+        }
+
+        .toggle-right {
+          right: auto;
+          bottom: 0;
+          top: auto;
+          transform: translateY(0);
+        }
+        .container.active-consultee-signup .toggle-right,
+        .container.active-consultant-signup .toggle-right,
+        .container.active-consultant-signin .toggle-right,
+        .container.active-admin-signin .toggle-right,
+        .container.active-admin-signup .toggle-right {
+          transform: translateY(200%);
+        }
+
+        h1 {
+          font-size: 1.2rem;
+          margin-bottom: 4px;
+        }
+        .toggle-panel p {
+          font-size: 10px;
+          margin-bottom: 6px;
+        }
+        button {
+          padding: 8px 14px;
+          font-size: 10px;
+        }
+        input,
+        select {
+          padding: 8px 10px;
+          font-size: 11px;
+        }
+      }
+
+      @media (max-width: 375px) {
+        .container {
+          min-height: 640px;
+        }
+        h1 {
+          font-size: 1.1rem;
+        }
+        .social-icons a {
+          width: 26px;
+          height: 26px;
+          font-size: 10px;
+        }
+        button.btn-outline {
+          font-size: 9px;
+          padding: 6px 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="container">
+      <!-- Top-Left Logo -->
+      <a
+        href="http://127.0.0.1:5500/index.html"
+        class="card-logo"
+        title="Back to Home"
+      >
+        <img src="../Public/icon.PNG" alt="Logo" />
+      </a>
+
+      <!-- Hidden Admin Login Trigger -->
+      <div class="admin-trigger" id="admin-trigger" title="Admin Access">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8s0 0 0 0z"
+          />
+        </svg>
+      </div>
+
+      <!-- Consultee Sign Up Form -->
+      <div class="form-container consultee-signup-container">
+        <form id="consultee-signup-form">
+          <h1>Consultee Sign Up</h1>
+          <div class="social-icons">
+            <a href="#">G</a><a href="#">f</a><a href="#">C</a
+            ><a href="#">in</a>
+          </div>
+          <span>Create an account to find expert advice</span>
+          <input type="text" id="cs-name" placeholder="Full Name" required />
+          <input
+            type="email"
+            id="cs-email"
+            placeholder="Email Address"
+            required
+          />
+          <input type="tel" id="cs-phone" placeholder="Phone Number" required />
+          <input
+            type="text"
+            id="cs-profession"
+            placeholder="Profession / Occupation"
+            required
+          />
+          <select id="cs-interest" required>
+            <option value="" disabled selected>Primary Area of Interest</option>
+            <option value="business">Business & Strategy</option>
+            <option value="tech">Tech & Software</option>
+            <option value="finance">Finance & Investment</option>
+            <option value="career">Career Coaching</option>
+            <option value="other">Other</option>
+          </select>
+          <span class="file-label">Profile Picture (Optional):</span>
+          <input type="file" id="cs-image" accept="image/*" />
+          <input
+            type="password"
+            id="cs-password"
+            placeholder="Password"
+            required
+          />
+          <button type="submit">REGISTER AS CONSULTEE</button>
+          <span class="toggle-link" id="goto-consultee-signin"
+            >Already have an account? Sign In</span
+          >
+        </form>
+      </div>
+
+      <!-- Consultant Sign Up Form -->
+      <div class="form-container consultant-signup-container">
+        <form id="consultant-signup-form">
+          <h1>Consultant Sign Up</h1>
+          <div class="social-icons">
+            <a href="#">G</a><a href="#">f</a><a href="#">C</a
+            ><a href="#">in</a>
+          </div>
+          <span>Join as a verified professional</span>
+          <input type="text" id="cn-name" placeholder="Full Name" required />
+          <input
+            type="email"
+            id="cn-email"
+            placeholder="Professional Email"
+            required
+          />
+          <input
+            type="text"
+            id="cn-expertise"
+            placeholder="Area of Expertise / Profession"
+            required
+          />
+          <input
+            type="number"
+            id="cn-exp"
+            placeholder="Years of Experience"
+            min="0"
+            required
+          />
+          <input
+            type="number"
+            id="cn-rate"
+            placeholder="Hourly Rate ($ USD)"
+            min="0"
+            required
+          />
+          <span class="file-label">Profile Picture (Optional):</span>
+          <input type="file" id="cn-image" accept="image/*" />
+          <input
+            type="password"
+            id="cn-password"
+            placeholder="Password"
+            required
+          />
+          <button type="submit">REGISTER AS CONSULTANT</button>
+          <span class="toggle-link" id="goto-consultant-signin"
+            >Already registered? Sign In</span
+          >
+        </form>
+      </div>
+
+      <!-- Consultee Sign In Form -->
+      <div class="form-container sign-in-container">
+        <form id="signin-form">
+          <h1>Consultee Sign In</h1>
+          <div class="social-icons">
+            <a href="#">G</a><a href="#">f</a><a href="#">C</a
+            ><a href="#">in</a>
+          </div>
+          <span>Sign in with Email & Password</span>
+          <input
+            type="email"
+            id="si-email"
+            placeholder="Enter E-mail"
+            required
+          />
+          <input
+            type="password"
+            id="si-password"
+            placeholder="Enter Password"
+            required
+          />
+          <a href="#" class="forgot-pass" data-role="consultee"
+            >Forget Password?</a
+          >
+          <button type="submit">SIGN IN</button>
+          <span class="toggle-link" id="goto-consultee-signup"
+            >New Consultee? Sign Up Here</span
+          >
+        </form>
+      </div>
+
+      <!-- Consultant Sign In Form -->
+      <div class="form-container consultant-signin-container">
+        <form id="consultant-signin-form">
+          <h1>Consultant Sign In</h1>
+          <div class="social-icons">
+            <a href="#">G</a><a href="#">f</a><a href="#">C</a
+            ><a href="#">in</a>
+          </div>
+          <span>Access Consultant Portal</span>
+          <input
+            type="text"
+            id="cnsi-email"
+            placeholder="Consultant ID / Email"
+            required
+          />
+          <input
+            type="password"
+            id="cnsi-password"
+            placeholder="Enter Password"
+            required
+          />
+          <a href="#" class="forgot-pass" data-role="consultant"
+            >Forget Password?</a
+          >
+          <button type="submit">LOGIN AS CONSULTANT</button>
+          <span class="toggle-link" id="goto-consultant-signup"
+            >New Consultant? Sign Up Here</span
+          >
+        </form>
+      </div>
+
+      <!-- Hidden Admin Sign In Form -->
+      <div class="form-container admin-signin-container">
+        <form id="admin-signin-form">
+          <h1>Admin Portal 🔒</h1>
+          <span>Restricted Administrative Access</span>
+          <input
+            type="text"
+            id="ad-email"
+            placeholder="Admin Security Key / Email"
+            required
+          />
+          <input
+            type="password"
+            id="ad-password"
+            placeholder="Admin Password"
+            required
+          />
+          <a href="#" class="forgot-pass" data-role="admin">Forget Password?</a>
+          <button type="submit" style="background-color: #0f172a">
+            AUTHENTICATE ADMIN
+          </button>
+          <span class="toggle-link" id="goto-admin-signup"
+            >New Admin? Register Here</span
+          >
+        </form>
+      </div>
+
+      <!-- Admin Sign Up Form -->
+      <div class="form-container admin-signup-container">
+        <form id="admin-signup-form">
+          <h1>Admin Registration 🛡️</h1>
+          <span>Create Administrative Credentials</span>
+          <input type="text" id="adsu-name" placeholder="Full Name" required />
+          <input
+            type="email"
+            id="adsu-email"
+            placeholder="Admin Email"
+            required
+          />
+          <input
+            type="password"
+            id="adsu-masterkey"
+            placeholder="Master Security Key (e.g., ADMIN2026)"
+            required
+          />
+          <input
+            type="password"
+            id="adsu-password"
+            placeholder="Create Admin Password"
+            required
+          />
+          <span class="file-label">Profile Picture (Optional):</span>
+          <input type="file" id="adsu-image" accept="image/*" />
+          <button type="submit" style="background-color: #0f172a">
+            CREATE ADMIN ACCOUNT
+          </button>
+          <span class="toggle-link" id="goto-admin-signin"
+            >Already Admin? Sign In</span
+          >
+        </form>
+      </div>
+
+      <!-- Sliding Toggle Overlay Panel -->
+      <div class="toggle-container">
+        <div class="toggle">
+          <div class="toggle-panel toggle-left">
+            <h1>Welcome Back! 👋</h1>
+            <p>Already registered? Switch to sign in</p>
+            <div class="toggle-btns">
+              <button class="btn-outline" id="consultee-signin-btn">
+                CONSULTEE SIGN IN
+              </button>
+              <button class="btn-outline" id="consultant-signin-btn">
+                CONSULTANT SIGN IN
+              </button>
+            </div>
+          </div>
+
+          <div class="toggle-panel toggle-right">
+            <h1>Hello There! 👋😊</h1>
+            <p>New to our platform? Choose your registration path</p>
+            <div class="toggle-btns">
+              <button class="btn-outline" id="consultee-signup-btn">
+                CONSULTEE SIGN UP
+              </button>
+              <button class="btn-outline" id="consultant-signup-btn">
+                CONSULTANT SIGN UP
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div class="modal-overlay" id="reset-modal">
+      <div class="modal-card">
+        <span class="modal-close" id="close-reset-modal">&times;</span>
+        <h1 style="font-size: 1.3rem; margin-bottom: 6px">Reset Password</h1>
+        <span style="display: inline-block; margin-bottom: 12px"
+          >Enter your registered email and new password</span
+        >
+        <form id="reset-password-form">
+          <select id="reset-role" required>
+            <option value="consultee">Consultee Account</option>
+            <option value="consultant">Consultant Account</option>
+            <option value="admin">Admin Account</option>
+          </select>
+          <input
+            type="email"
+            id="reset-email"
+            placeholder="Registered Email"
+            required
+          />
+          <input
+            type="password"
+            id="reset-new-password"
+            placeholder="New Password"
+            required
+          />
+          <button type="submit" style="width: 100%; margin-top: 10px">
+            UPDATE PASSWORD
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = "http://localhost:5000/api";
+
+      const container = document.getElementById("container");
+      const consulteeSignUpBtn = document.getElementById(
+        "consultee-signup-btn"
+      );
+      const consultantSignUpBtn = document.getElementById(
+        "consultant-signup-btn"
+      );
+      const consulteeSignInBtn = document.getElementById(
+        "consultee-signin-btn"
+      );
+      const consultantSignInBtn = document.getElementById(
+        "consultant-signin-btn"
+      );
+      const adminTrigger = document.getElementById("admin-trigger");
+
+      const gotoAdminSignUp = document.getElementById("goto-admin-signup");
+      const gotoAdminSignIn = document.getElementById("goto-admin-signin");
+      const gotoConsulteeSignUp = document.getElementById(
+        "goto-consultee-signup"
+      );
+      const gotoConsulteeSignIn = document.getElementById(
+        "goto-consultee-signin"
+      );
+      const gotoConsultantSignUp = document.getElementById(
+        "goto-consultant-signup"
+      );
+      const gotoConsultantSignIn = document.getElementById(
+        "goto-consultant-signin"
+      );
+
+      const resetModal = document.getElementById("reset-modal");
+      const closeResetModal = document.getElementById("close-reset-modal");
+      const resetRoleSelect = document.getElementById("reset-role");
+
+      function getInitials(name) {
+        if (!name) return "U";
+        const parts = name.trim().split(" ");
+        if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+        return (
+          parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+        ).toUpperCase();
+      }
+
+      function getBase64(file) {
+        return new Promise((resolve, reject) => {
+          if (!file) return resolve("");
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      }
+
+      function clearActiveClasses() {
+        container.classList.remove(
+          "active-consultee-signup",
+          "active-consultant-signup",
+          "active-consultant-signin",
+          "active-admin-signin",
+          "active-admin-signup"
+        );
+      }
+
+      // UI Toggle Listeners
+      consulteeSignUpBtn.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-consultee-signup");
+      });
+      consultantSignUpBtn.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-consultant-signup");
+      });
+      consulteeSignInBtn.addEventListener("click", () => {
+        clearActiveClasses();
+      });
+      consultantSignInBtn.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-consultant-signin");
+      });
+      adminTrigger.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-admin-signin");
+      });
+      gotoAdminSignUp.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-admin-signup");
+      });
+      gotoAdminSignIn.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-admin-signin");
+      });
+      gotoConsulteeSignUp.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-consultee-signup");
+      });
+      gotoConsulteeSignIn.addEventListener("click", () => {
+        clearActiveClasses();
+      });
+      gotoConsultantSignUp.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-consultant-signup");
+      });
+      gotoConsultantSignIn.addEventListener("click", () => {
+        clearActiveClasses();
+        container.classList.add("active-consultant-signin");
+      });
+
+      // Reset Password Modal
+      document.querySelectorAll(".forgot-pass").forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const role = link.getAttribute("data-role");
+          if (role) resetRoleSelect.value = role;
+          resetModal.style.display = "flex";
+        });
+      });
+
+      closeResetModal.addEventListener("click", () => {
+        resetModal.style.display = "none";
+      });
+
+      document
+        .getElementById("reset-password-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const role = resetRoleSelect.value;
+          const email = document.getElementById("reset-email").value.trim();
+          const newPassword =
+            document.getElementById("reset-new-password").value;
+
+          try {
+            const res = await fetch(`${API_URL}/reset-password`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, role, newPassword }),
+            });
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.message);
+
+            alert(data.message);
+            resetModal.style.display = "none";
+            document.getElementById("reset-password-form").reset();
+          } catch (err) {
+            alert(err.message);
+          }
+        });
+
+      // Consultee Registration
+      document
+        .getElementById("consultee-signup-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const name = document.getElementById("cs-name").value.trim();
+          const file = document.getElementById("cs-image").files[0];
+          const profileImage = file ? await getBase64(file) : "";
+
+          const payload = {
+            role: "consultee",
+            name,
+            email: document.getElementById("cs-email").value.trim(),
+            phone: document.getElementById("cs-phone").value,
+            profession: document.getElementById("cs-profession").value,
+            interest: document.getElementById("cs-interest").value,
+            initials: getInitials(name),
+            profileImage,
+            password: document.getElementById("cs-password").value,
+          };
+
+          try {
+            const res = await fetch(`${API_URL}/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+
+            localStorage.setItem("currentUser", JSON.stringify(data.user));
+            alert("Consultee registration successful!");
+            window.location.href =
+              "http://127.0.0.1:5500/Structures/dashboard.html";
+          } catch (err) {
+            alert(err.message);
+          }
+        });
+
+      // Consultant Registration
+      document
+        .getElementById("consultant-signup-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const name = document.getElementById("cn-name").value.trim();
+          const file = document.getElementById("cn-image").files[0];
+          const profileImage = file ? await getBase64(file) : "";
+
+          const payload = {
+            role: "consultant",
+            name,
+            email: document.getElementById("cn-email").value.trim(),
+            profession: document.getElementById("cn-expertise").value,
+            expertise: document.getElementById("cn-expertise").value,
+            experience: document.getElementById("cn-exp").value,
+            rate: document.getElementById("cn-rate").value,
+            initials: getInitials(name),
+            profileImage,
+            password: document.getElementById("cn-password").value,
+          };
+
+          try {
+            const res = await fetch(`${API_URL}/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+
+            localStorage.setItem("currentUser", JSON.stringify(data.user));
+            alert("Consultant registration successful!");
+            window.location.href =
+              "http://127.0.0.1:5500/Structures/consultant.html";
+          } catch (err) {
+            alert(err.message);
+          }
+        });
+
+      // Admin Registration
+      document
+        .getElementById("admin-signup-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const masterkey = document
+            .getElementById("adsu-masterkey")
+            .value.trim();
+          if (masterkey !== "ADMIN2026") {
+            alert("Invalid Security Key. Unauthorized Admin Registration!");
+            return;
+          }
+
+          const name = document.getElementById("adsu-name").value.trim();
+          const file = document.getElementById("adsu-image").files[0];
+          const profileImage = file ? await getBase64(file) : "";
+
+          const payload = {
+            role: "admin",
+            name,
+            email: document.getElementById("adsu-email").value.trim(),
+            profession: "System Administrator",
+            initials: getInitials(name),
+            profileImage,
+            password: document.getElementById("adsu-password").value,
+          };
+
+          try {
+            const res = await fetch(`${API_URL}/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+
+            localStorage.setItem("currentUser", JSON.stringify(data.user));
+            alert("Admin account successfully created!");
+            window.location.href =
+              "http://127.0.0.1:5500/Structures/admin.html";
+          } catch (err) {
+            alert(err.message);
+          }
+        });
+
+      // Generic Login Handler
+      async function handleLogin(emailId, passwordId, role, redirectUrl) {
+        const email = document.getElementById(emailId).value.trim();
+        const password = document.getElementById(passwordId).value;
+
+        try {
+          const res = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, role }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message);
+
+          localStorage.setItem("currentUser", JSON.stringify(data.user));
+          alert(`Welcome back, ${data.user.name}!`);
+          window.location.href = redirectUrl;
+        } catch (err) {
+          alert(err.message);
+        }
+      }
+
+      // Sign-In Submissions
+      document.getElementById("signin-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        handleLogin(
+          "si-email",
+          "si-password",
+          "consultee",
+          "http://127.0.0.1:5500/Structures/dashboard.html"
+        );
+      });
+
+      document
+        .getElementById("consultant-signin-form")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          handleLogin(
+            "cnsi-email",
+            "cnsi-password",
+            "consultant",
+            "http://127.0.0.1:5500/Structures/consultant.html"
+          );
+        });
+
+      document
+        .getElementById("admin-signin-form")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+          handleLogin(
+            "ad-email",
+            "ad-password",
+            "admin",
+            "http://127.0.0.1:5500/Structures/admin.html"
+          );
+        });
+    </script>
+  </body>
+</html>

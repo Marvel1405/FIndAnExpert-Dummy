@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consultant Dashboard</title>
+    <link rel="icon" type="image/jpeg" href="../Public/icon.PNG" />
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --primary: #2563eb;
+        --accent: #3b82f6;
+        --border: #334155;
+        --danger: #ef4444;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --card-header-bg: rgba(30, 41, 59, 0.85);
+      }
+
+      [data-theme="light"] {
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --primary: #2563eb;
+        --accent: #3b82f6;
+        --border: #e2e8f0;
+        --card-header-bg: rgba(255, 255, 255, 0.95);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      html,
+      body {
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        display: flex;
+        min-height: 100vh;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+
+      /* Sidebar & Drawer */
+      .sidebar {
+        width: 260px;
+        background-color: var(--card);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
+        flex-shrink: 0;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+        transition: transform 0.3s ease, background-color 0.2s ease;
+        z-index: 999;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+      }
+
+      .brand img {
+        height: 32px;
+        width: auto;
+      }
+
+      .brand h2 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+      }
+
+      .nav-links {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .nav-links a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .nav-links a:hover,
+      .nav-links a.active {
+        background-color: var(--primary);
+        color: #fff;
+      }
+
+      /* Mobile Drawer Backdrop */
+      .drawer-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(2px);
+        z-index: 998;
+      }
+
+      .drawer-backdrop.open {
+        display: block;
+      }
+
+      .main-content {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      header {
+        height: 70px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 24px;
+        background-color: var(--card-header-bg);
+        backdrop-filter: blur(8px);
+        position: sticky;
+        top: 0;
+        z-index: 900;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .hamburger-btn {
+        display: none;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-size: 18px;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .header-title {
+        min-width: 0;
+      }
+
+      .header-title h1 {
+        font-size: 1.15rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-title p {
+        font-size: 11px;
+        color: var(--text-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .theme-switch-btn {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: border-color 0.2s;
+      }
+
+      .theme-switch-btn:hover {
+        border-color: var(--primary);
+      }
+
+      .profile-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 4px 10px 4px 6px;
+        border-radius: 30px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+
+      .profile-card:hover {
+        border-color: var(--primary);
+      }
+
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 13px;
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+
+      .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .profile-info {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .profile-info .name {
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .profile-info .role {
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+
+      .dashboard-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .tab-page {
+        display: none;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .tab-page.active {
+        display: flex;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+      }
+
+      .metric-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .metric-card .title {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .metric-card .value {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .table-container {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .table-header h3 {
+        font-size: 1rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 12px;
+        min-width: 500px;
+      }
+
+      th {
+        color: var(--text-muted);
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+      }
+
+      td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      .badge {
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: capitalize;
+        display: inline-block;
+      }
+
+      .badge-upcoming {
+        background-color: rgba(37, 99, 235, 0.2);
+        color: #60a5fa;
+      }
+      .badge-completed {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+      }
+      .badge-cancelled {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+      }
+
+      .btn-primary-action {
+        background-color: var(--primary);
+        color: #fff;
+        border: none;
+        padding: 7px 14px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+
+      .btn-primary-action:hover {
+        opacity: 0.9;
+      }
+
+      .btn-logout {
+        background-color: transparent;
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        padding: 10px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+        width: 100%;
+        transition: all 0.2s ease;
+      }
+
+      .btn-logout:hover {
+        background-color: var(--danger);
+        color: #fff;
+      }
+
+      /* Modal Styling */
+      .modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 16px;
+      }
+
+      .modal-backdrop.open {
+        display: flex;
+      }
+
+      .modal-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 440px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
+      }
+
+      .modal-header h3 {
+        font-size: 16px;
+      }
+
+      .modal-close {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .form-group label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .form-group input,
+      .form-group select {
+        background-color: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 9px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        width: 100%;
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      .btn-secondary {
+        background-color: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        border: none;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      /* Responsive Breakpoints */
+      @media (max-width: 768px) {
+        .hamburger-btn {
+          display: flex;
+        }
+
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100vh;
+          transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        header {
+          padding: 0 16px;
+        }
+
+        .dashboard-body {
+          padding: 16px;
+        }
+
+        .profile-info {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="brand">
+          <img src="../Public/icon.PNG" alt="Logo" />
+          <h2>Consultant Portal</h2>
+        </div>
+        <ul class="nav-links">
+          <li>
+            <a class="nav-item active" data-tab="tab-overview">📊 Overview</a>
+          </li>
+          <li>
+            <a class="nav-item" data-tab="tab-appointments">📅 Appointments</a>
+          </li>
+          <li>
+            <a class="nav-item" data-tab="tab-earnings">💰 Earnings</a>
+          </li>
+        </ul>
+      </div>
+
+      <button class="btn-logout" id="logout-btn">Log Out</button>
+    </aside>
+
+    <main class="main-content">
+      <header>
+        <div class="header-left">
+          <button
+            class="hamburger-btn"
+            id="hamburger-btn"
+            aria-label="Toggle Menu"
+          >
+            ☰
+          </button>
+          <div class="header-title">
+            <h1 id="page-heading">Consultant Overview</h1>
+            <p id="profile-email">consultant@system.com</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="theme-switch-btn" id="theme-switch-btn">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-text">Night</span>
+          </button>
+
+          <div class="profile-card" id="open-profile-modal">
+            <div class="avatar" id="profile-avatar">CN</div>
+            <div class="profile-info">
+              <span class="name" id="profile-name">Consultant User</span>
+              <span class="role" id="profile-profession">Senior Consultant</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="dashboard-body">
+        <!-- Tab 1: Overview -->
+        <div id="tab-overview" class="tab-page active">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span class="title">Total Sessions</span>
+              <span class="value" id="metric-total-sessions">0</span>
+            </div>
+            <div class="metric-card">
+              <span class="title">Active Bookings</span>
+              <span class="value" id="metric-active-bookings">0</span>
+            </div>
+            <div class="metric-card">
+              <span class="title">Hourly Rate</span>
+              <span class="value" id="metric-hourly-rate">$80/hr</span>
+            </div>
+            <div class="metric-card">
+              <span class="title">Rating</span>
+              <span class="value">4.9 ★</span>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Recent Sessions</h3>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Topic</th>
+                  <th>Date & Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="overview-sessions-tbody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 2: Appointments -->
+        <div id="tab-appointments" class="tab-page">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>All Appointments</h3>
+              <button class="btn-primary-action" id="open-new-appointment-modal">
+                + New Appointment
+              </button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Email</th>
+                  <th>Topic</th>
+                  <th>Date & Time</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="appointments-tbody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: Earnings -->
+        <div id="tab-earnings" class="tab-page">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span class="title">This Month</span>
+              <span class="value" id="earnings-month">$1,920</span>
+            </div>
+            <div class="metric-card">
+              <span class="title">Total Earned</span>
+              <span class="value" id="earnings-total">$14,500</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Consultant Profile Modal -->
+    <div class="modal-backdrop" id="profile-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Consultant Profile Settings</h3>
+          <button class="modal-close" id="close-profile-modal">&times;</button>
+        </div>
+
+        <form
+          id="edit-profile-form"
+          style="display: flex; flex-direction: column; gap: 14px"
+        >
+          <div class="form-group">
+            <label>Profile Picture</label>
+            <input type="file" id="input-avatar-file" accept="image/*" />
+          </div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="input-name" required />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="input-email" required />
+          </div>
+          <div class="form-group">
+            <label>Expertise</label>
+            <input type="text" id="input-profession" />
+          </div>
+          <div class="form-group">
+            <label>Hourly Rate ($)</label>
+            <input type="number" id="input-rate" value="80" />
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="cancel-profile-btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- New Appointment Modal -->
+    <div class="modal-backdrop" id="appointment-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Schedule New Appointment</h3>
+          <button class="modal-close" id="close-appointment-modal">&times;</button>
+        </div>
+
+        <form
+          id="new-appointment-form"
+          style="display: flex; flex-direction: column; gap: 14px"
+        >
+          <div class="form-group">
+            <label>Client Name</label>
+            <input type="text" id="app-client" required placeholder="e.g. Bukola Doe" />
+          </div>
+          <div class="form-group">
+            <label>Client Email</label>
+            <input type="email" id="app-email" required placeholder="client@domain.com" />
+          </div>
+          <div class="form-group">
+            <label>Topic / Service</label>
+            <input type="text" id="app-topic" required placeholder="e.g. Business Strategy" />
+          </div>
+          <div class="form-group">
+            <label>Date & Time</label>
+            <input type="text" id="app-datetime" required placeholder="Sep 15, 2026 - 2:00 PM" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="app-status">
+              <option value="upcoming">Upcoming</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="cancel-appointment-btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary">Save Appointment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let user = JSON.parse(localStorage.getItem("currentUser")) || {
+        name: "Consultant User",
+        email: "consultant@system.com",
+        role: "consultant",
+        profession: "Senior Consultant",
+        rate: 80,
+        avatar: "",
+        initials: "CN",
+      };
+
+      let appointments = JSON.parse(localStorage.getItem("consultant_appointments")) || [
+        {
+          id: 1,
+          client: "Bukola Doe",
+          email: "bukola@gmail.com",
+          topic: "Business Strategy",
+          datetime: "Sep 14, 2026 - 10:00 AM",
+          status: "completed",
+        },
+        {
+          id: 2,
+          client: "Klaus",
+          email: "klaus@domain.com",
+          topic: "Market Analysis",
+          datetime: "Sep 16, 2026 - 1:00 PM",
+          status: "upcoming",
+        },
+      ];
+
+      function saveAppointments() {
+        localStorage.setItem("consultant_appointments", JSON.stringify(appointments));
+        renderDashboard();
+      }
+
+      function getInitials(name) {
+        return name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2);
+      }
+
+      function renderProfile() {
+        document.getElementById("profile-name").textContent = user.name;
+        document.getElementById("profile-email").textContent = user.email;
+        document.getElementById("profile-profession").textContent = user.profession;
+        document.getElementById("metric-hourly-rate").textContent = `$${user.rate || 80}/hr`;
+
+        const avatarEl = document.getElementById("profile-avatar");
+        if (user.avatar) {
+          avatarEl.innerHTML = `<img src="${user.avatar}" alt="Avatar" />`;
+        } else {
+          avatarEl.textContent = getInitials(user.name);
+        }
+      }
+
+      function renderDashboard() {
+        renderProfile();
+
+        const activeCount = appointments.filter((a) => a.status === "upcoming").length;
+        document.getElementById("metric-total-sessions").textContent = appointments.length;
+        document.getElementById("metric-active-bookings").textContent = activeCount;
+
+        // Render Overview Table (Recent 5)
+        const overviewTbody = document.getElementById("overview-sessions-tbody");
+        overviewTbody.innerHTML = appointments
+          .slice(0, 5)
+          .map(
+            (app) => `
+              <tr>
+                <td><strong>${app.client}</strong></td>
+                <td>${app.topic}</td>
+                <td>${app.datetime}</td>
+                <td><span class="badge badge-${app.status}">${app.status}</span></td>
+              </tr>
+            `
+          )
+          .join("");
+
+        // Render Appointments Table
+        const appointmentsTbody = document.getElementById("appointments-tbody");
+        appointmentsTbody.innerHTML = appointments
+          .map(
+            (app) => `
+              <tr>
+                <td><strong>${app.client}</strong></td>
+                <td>${app.email}</td>
+                <td>${app.topic}</td>
+                <td>${app.datetime}</td>
+                <td><span class="badge badge-${app.status}">${app.status}</span></td>
+                <td>
+                  <button class="btn-secondary" style="padding: 4px 8px; font-size: 10px;" onclick="toggleStatus(${app.id})">
+                    Cycle Status
+                  </button>
+                  <button class="btn-logout" style="width: auto; padding: 4px 8px; font-size: 10px;" onclick="deleteAppointment(${app.id})">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            `
+          )
+          .join("");
+      }
+
+      window.toggleStatus = function (id) {
+        const item = appointments.find((a) => a.id === id);
+        if (!item) return;
+        const cycle = { upcoming: "completed", completed: "cancelled", cancelled: "upcoming" };
+        item.status = cycle[item.status] || "upcoming";
+        saveAppointments();
+      };
+
+      window.deleteAppointment = function (id) {
+        appointments = appointments.filter((a) => a.id !== id);
+        saveAppointments();
+      };
+
+      // Hamburger Drawer Toggle
+      const hamburgerBtn = document.getElementById("hamburger-btn");
+      const sidebar = document.getElementById("sidebar");
+      const drawerBackdrop = document.getElementById("drawer-backdrop");
+
+      function toggleDrawer(open) {
+        sidebar.classList.toggle("open", open);
+        drawerBackdrop.classList.toggle("open", open);
+      }
+
+      hamburgerBtn.addEventListener("click", () => {
+        const isOpen = sidebar.classList.contains("open");
+        toggleDrawer(!isOpen);
+      });
+
+      drawerBackdrop.addEventListener("click", () => toggleDrawer(false));
+
+      // Day / Night Theme Switcher
+      const themeSwitchBtn = document.getElementById("theme-switch-btn");
+      const themeIcon = document.getElementById("theme-icon");
+      const themeText = document.getElementById("theme-text");
+
+      function setTheme(theme) {
+        if (theme === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+          themeIcon.textContent = "☀️";
+          themeText.textContent = "Day";
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+          themeIcon.textContent = "🌙";
+          themeText.textContent = "Night";
+        }
+        localStorage.setItem("dashboard_theme", theme);
+      }
+
+      const savedTheme = localStorage.getItem("dashboard_theme") || "dark";
+      setTheme(savedTheme);
+
+      themeSwitchBtn.addEventListener("click", () => {
+        const currentTheme = localStorage.getItem("dashboard_theme") || "dark";
+        setTheme(currentTheme === "dark" ? "light" : "dark");
+      });
+
+      // Profile Modal Handling & Image Upload
+      const profileModal = document.getElementById("profile-modal");
+      const openModalBtn = document.getElementById("open-profile-modal");
+      const closeModalBtn = document.getElementById("close-profile-modal");
+      const cancelModalBtn = document.getElementById("cancel-profile-btn");
+      const editProfileForm = document.getElementById("edit-profile-form");
+
+      openModalBtn.addEventListener("click", () => {
+        document.getElementById("input-name").value = user.name || "";
+        document.getElementById("input-email").value = user.email || "";
+        document.getElementById("input-profession").value = user.profession || "";
+        document.getElementById("input-rate").value = user.rate || 80;
+        profileModal.classList.add("open");
+      });
+
+      function closeProfileModal() {
+        profileModal.classList.remove("open");
+      }
+
+      closeModalBtn.addEventListener("click", closeProfileModal);
+      cancelModalBtn.addEventListener("click", closeProfileModal);
+      profileModal.addEventListener("click", (e) => {
+        if (e.target === profileModal) closeProfileModal();
+      });
+
+      editProfileForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById("input-avatar-file");
+
+        user.name = document.getElementById("input-name").value.trim();
+        user.email = document.getElementById("input-email").value.trim();
+        user.profession = document.getElementById("input-profession").value.trim();
+        user.rate = Number(document.getElementById("input-rate").value) || 80;
+
+        if (fileInput.files && fileInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            user.avatar = event.target.result;
+            localStorage.setItem("currentUser", JSON.stringify(user));
+            renderDashboard();
+            closeProfileModal();
+          };
+          reader.readAsDataURL(fileInput.files[0]);
+        } else {
+          localStorage.setItem("currentUser", JSON.stringify(user));
+          renderDashboard();
+          closeProfileModal();
+        }
+      });
+
+      // New Appointment Modal Handling
+      const appModal = document.getElementById("appointment-modal");
+      const openAppModalBtn = document.getElementById("open-new-appointment-modal");
+      const closeAppModalBtn = document.getElementById("close-appointment-modal");
+      const cancelAppModalBtn = document.getElementById("cancel-appointment-btn");
+      const newAppForm = document.getElementById("new-appointment-form");
+
+      openAppModalBtn.addEventListener("click", () => {
+        appModal.classList.add("open");
+      });
+
+      function closeAppModal() {
+        appModal.classList.remove("open");
+        newAppForm.reset();
+      }
+
+      closeAppModalBtn.addEventListener("click", closeAppModal);
+      cancelAppModalBtn.addEventListener("click", closeAppModal);
+      appModal.addEventListener("click", (e) => {
+        if (e.target === appModal) closeAppModal();
+      });
+
+      newAppForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const newApp = {
+          id: Date.now(),
+          client: document.getElementById("app-client").value.trim(),
+          email: document.getElementById("app-email").value.trim(),
+          topic: document.getElementById("app-topic").value.trim(),
+          datetime: document.getElementById("app-datetime").value.trim(),
+          status: document.getElementById("app-status").value,
+        };
+
+        appointments.unshift(newApp);
+        saveAppointments();
+        closeAppModal();
+      });
+
+      // Tab Switching Mechanics
+      const navItems = document.querySelectorAll(".nav-item");
+      const tabPages = document.querySelectorAll(".tab-page");
+      const heading = document.getElementById("page-heading");
+
+      navItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          navItems.forEach((n) => n.classList.remove("active"));
+          tabPages.forEach((p) => p.classList.remove("active"));
+
+          item.classList.add("active");
+          const targetTab = item.getAttribute("data-tab");
+          document.getElementById(targetTab).classList.add("active");
+
+          heading.textContent = item.textContent
+            .replace(/[^\w\s]/gi, "")
+            .trim();
+          toggleDrawer(false);
+        });
+      });
+
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        localStorage.removeItem("currentUser");
+        window.location.href = "register.html";
+      });
+
+      // Initial Render
+      renderDashboard();
+    </script>
+  </body>
+</html>

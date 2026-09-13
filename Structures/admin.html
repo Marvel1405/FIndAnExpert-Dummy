@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="icon" type="image/jpeg" href="../Public/icon.PNG" />
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --primary: #2563eb;
+        --accent: #3b82f6;
+        --border: #334155;
+        --danger: #ef4444;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --card-header-bg: rgba(30, 41, 59, 0.5);
+      }
+
+      [data-theme="light"] {
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --primary: #2563eb;
+        --accent: #3b82f6;
+        --border: #e2e8f0;
+        --card-header-bg: rgba(255, 255, 255, 0.85);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text);
+        display: flex;
+        min-height: 100vh;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+
+      /* Sidebar & Drawer */
+      .sidebar {
+        width: 260px;
+        background-color: var(--card);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px;
+        flex-shrink: 0;
+        transition: transform 0.3s ease, background-color 0.2s ease;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 30px;
+      }
+
+      .brand img {
+        height: 32px;
+        width: auto;
+      }
+
+      .brand h2 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+      }
+
+      .nav-links {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .nav-links a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+
+      .nav-links a:hover,
+      .nav-links a.active {
+        background-color: var(--primary);
+        color: #fff;
+      }
+
+      /* Mobile Drawer Backdrop */
+      .drawer-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(2px);
+        z-index: 998;
+      }
+
+      .drawer-backdrop.open {
+        display: block;
+      }
+
+      .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      header {
+        height: 70px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 30px;
+        background-color: var(--card-header-bg);
+        backdrop-filter: blur(8px);
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .hamburger-btn {
+        display: none;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-size: 18px;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .header-title h1 {
+        font-size: 1.3rem;
+      }
+
+      .header-title p {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      /* Day/Night Theme Switcher Button */
+      .theme-switch-btn {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: border-color 0.2s;
+      }
+
+      .theme-switch-btn:hover {
+        border-color: var(--primary);
+      }
+
+      .profile-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 6px 14px 6px 8px;
+        border-radius: 30px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+
+      .profile-card:hover {
+        border-color: var(--primary);
+      }
+
+      .avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        overflow: hidden;
+      }
+
+      .profile-info {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .profile-info .name {
+        font-size: 13px;
+        font-weight: bold;
+      }
+
+      .profile-info .role {
+        font-size: 10px;
+        color: var(--text-muted);
+      }
+
+      .dashboard-body {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .tab-page {
+        display: none;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .tab-page.active {
+        display: flex;
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      .metric-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .metric-card .title {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .metric-card .value {
+        font-size: 1.6rem;
+        font-weight: bold;
+      }
+
+      .table-container {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        overflow-x: auto;
+      }
+
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .table-header h3 {
+        font-size: 1rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 12px;
+      }
+
+      th {
+        color: var(--text-muted);
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+      }
+
+      td {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      .badge {
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: capitalize;
+        display: inline-block;
+      }
+
+      .badge-admin {
+        background-color: rgba(37, 99, 235, 0.2);
+        color: #60a5fa;
+      }
+      .badge-consultant {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+      }
+      .badge-consultee {
+        background-color: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+      }
+      .badge-active {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+      }
+      .badge-idle {
+        background-color: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+      }
+      .badge-restricted {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+      }
+
+      .btn-action {
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        transition: opacity 0.2s;
+      }
+
+      .btn-action:hover {
+        opacity: 0.85;
+      }
+
+      .btn-restrict {
+        background-color: var(--danger);
+        color: #fff;
+      }
+      .btn-activate {
+        background-color: var(--success);
+        color: #fff;
+      }
+
+      .btn-logout {
+        background-color: transparent;
+        color: var(--danger);
+        border: 1px solid var(--danger);
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: bold;
+        width: 100%;
+        transition: all 0.2s ease;
+      }
+
+      .btn-logout:hover {
+        background-color: var(--danger);
+        color: #fff;
+      }
+
+      .settings-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-width: 600px;
+      }
+
+      .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .setting-row:last-child {
+        border-bottom: none;
+      }
+
+      .setting-info h4 {
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+      .setting-info p {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 22px;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #475569;
+        transition: 0.4s;
+        border-radius: 22px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: var(--primary);
+      }
+      input:checked + .slider:before {
+        transform: translateX(22px);
+      }
+
+      /* Modal Styling */
+      .modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+      }
+
+      .modal-backdrop.open {
+        display: flex;
+      }
+
+      .modal-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 440px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 12px;
+      }
+
+      .modal-header h3 {
+        font-size: 16px;
+      }
+
+      .modal-close {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .form-group label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .form-group input,
+      .form-group select {
+        background-color: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 9px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+
+      .form-group input:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      .btn-secondary {
+        background-color: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        border: none;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      /* Responsive Drawer for mobile */
+      @media (max-width: 768px) {
+        .hamburger-btn {
+          display: flex;
+        }
+
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          height: 100vh;
+          z-index: 999;
+          transform: translateX(-100%);
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        header {
+          padding: 0 16px;
+        }
+
+        .dashboard-body {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Mobile Drawer Overlay -->
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="brand">
+          <img src="../Public/icon.PNG" alt="Logo" />
+          <h2>Admin Control</h2>
+        </div>
+        <ul class="nav-links">
+          <li>
+            <a class="nav-item active" data-tab="tab-overview">📊 Overview</a>
+          </li>
+          <li>
+            <a class="nav-item" data-tab="tab-users">👥 User Management</a>
+          </li>
+          <li>
+            <a class="nav-item" data-tab="tab-consultants">💼 Consultants</a>
+          </li>
+          <li>
+            <a class="nav-item" data-tab="tab-consultees">🤝 Consultees</a>
+          </li>
+          <li>
+            <a class="nav-item" data-tab="tab-security">⚙️ Security Settings</a>
+          </li>
+        </ul>
+      </div>
+
+      <button class="btn-logout" id="logout-btn">Log Out</button>
+    </aside>
+
+    <main class="main-content">
+      <header>
+        <div class="header-left">
+          <button
+            class="hamburger-btn"
+            id="hamburger-btn"
+            aria-label="Toggle Menu"
+          >
+            ☰
+          </button>
+          <div class="header-title">
+            <h1 id="page-heading">System Overview</h1>
+            <p id="profile-email">admin@system.com</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Day/Night Switch Button -->
+          <button class="theme-switch-btn" id="theme-switch-btn">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-text">Night</span>
+          </button>
+
+          <!-- Clickable Admin Profile Widget -->
+          <div class="profile-card" id="open-profile-modal">
+            <div class="avatar" id="profile-avatar">SA</div>
+            <div class="profile-info">
+              <span class="name" id="profile-name">Admin User</span>
+              <span class="role" id="profile-profession"
+                >System Administrator</span
+              >
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="dashboard-body">
+        <!-- Tab 1: System Overview -->
+        <div id="tab-overview" class="tab-page active">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span class="title">Total Accounts</span>
+              <span class="value" id="metric-total">0</span>
+            </div>
+            <div class="metric-card">
+              <span class="title">Consultees</span>
+              <span class="value" id="metric-consultees">0</span>
+            </div>
+            <div class="metric-card">
+              <span class="title">Consultants</span>
+              <span class="value" id="metric-consultants">0</span>
+            </div>
+            <div class="metric-card">
+              <span class="title">Admins</span>
+              <span class="value" id="metric-admins">0</span>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Recent Registered Accounts</h3>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="overview-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 2: User Management -->
+        <div id="tab-users" class="tab-page">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>All Platform Accounts</h3>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Access Action</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: Consultants Directory -->
+        <div id="tab-consultants" class="tab-page">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Consultants List</h3>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Expertise</th>
+                  <th>Experience</th>
+                  <th>Hourly Rate</th>
+                  <th>Access Action</th>
+                </tr>
+              </thead>
+              <tbody id="consultants-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 4: Consultees Directory -->
+        <div id="tab-consultees" class="tab-page">
+          <div class="table-container">
+            <div class="table-header">
+              <h3>Consultees List</h3>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Access Action</th>
+                </tr>
+              </thead>
+              <tbody id="consultees-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 5: Security Settings -->
+        <div id="tab-security" class="tab-page">
+          <div class="settings-card">
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px">
+              Access & Platform Security
+            </h3>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Require Email Verification</h4>
+                <p>
+                  Mandate identity confirmation for all new Consultees and
+                  Consultants.
+                </p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="setting-verify" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Restrict Unverified Accounts Automatically</h4>
+                <p>
+                  Prevent newly registered users from booking sessions until
+                  manual admin approval.
+                </p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="setting-auto-restrict" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <h4>Consultant Verification Mandate</h4>
+                <p>
+                  Only verified consultants appear on the public marketplace.
+                </p>
+              </div>
+              <label class="toggle-switch">
+                <input
+                  type="checkbox"
+                  id="setting-consultant-mandate"
+                  checked
+                />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Admin View/Edit Profile Modal -->
+    <div class="modal-backdrop" id="profile-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Admin Profile Settings</h3>
+          <button class="modal-close" id="close-profile-modal">&times;</button>
+        </div>
+
+        <form
+          id="edit-profile-form"
+          style="display: flex; flex-direction: column; gap: 14px"
+        >
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="input-name" required />
+          </div>
+
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="input-email" required />
+          </div>
+
+          <div class="form-group">
+            <label>Profession / Title</label>
+            <input type="text" id="input-profession" />
+          </div>
+
+          <div class="form-group">
+            <label>Role (Locked for Admin)</label>
+            <input type="text" id="input-role" value="admin" disabled />
+          </div>
+
+          <div class="form-group">
+            <label>Initials (Avatar Fallback)</label>
+            <input type="text" id="input-initials" maxlength="3" />
+          </div>
+
+          <div class="form-group">
+            <label>Profile Image File</label>
+            <input type="file" id="input-avatar-file" accept="image/*" />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="cancel-profile-btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let user = JSON.parse(localStorage.getItem("currentUser"));
+
+      if (user && user.role === "admin") {
+        updateProfileUI(user);
+      } else {
+        window.location.href = "register.html";
+      }
+
+      function updateProfileUI(u) {
+        document.getElementById("profile-name").textContent = u.name;
+        document.getElementById("profile-email").textContent = u.email;
+        document.getElementById("profile-profession").textContent =
+          u.profession || "System Administrator";
+
+        const avatarElem = document.getElementById("profile-avatar");
+        if (u.profileImage) {
+          avatarElem.innerHTML = `<img src="${u.profileImage}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />`;
+        } else {
+          avatarElem.textContent = u.initials || "SA";
+        }
+      }
+
+      // Hamburger Drawer Toggle
+      const hamburgerBtn = document.getElementById("hamburger-btn");
+      const sidebar = document.getElementById("sidebar");
+      const drawerBackdrop = document.getElementById("drawer-backdrop");
+
+      function toggleDrawer(open) {
+        sidebar.classList.toggle("open", open);
+        drawerBackdrop.classList.toggle("open", open);
+      }
+
+      hamburgerBtn.addEventListener("click", () => {
+        const isOpen = sidebar.classList.contains("open");
+        toggleDrawer(!isOpen);
+      });
+
+      drawerBackdrop.addEventListener("click", () => toggleDrawer(false));
+
+      // Day / Night Theme Switcher
+      const themeSwitchBtn = document.getElementById("theme-switch-btn");
+      const themeIcon = document.getElementById("theme-icon");
+      const themeText = document.getElementById("theme-text");
+
+      function setTheme(theme) {
+        if (theme === "light") {
+          document.documentElement.setAttribute("data-theme", "light");
+          themeIcon.textContent = "☀️";
+          themeText.textContent = "Day";
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+          themeIcon.textContent = "🌙";
+          themeText.textContent = "Night";
+        }
+        localStorage.setItem("dashboard_theme", theme);
+      }
+
+      // Load saved theme (default dark)
+      const savedTheme = localStorage.getItem("dashboard_theme") || "dark";
+      setTheme(savedTheme);
+
+      themeSwitchBtn.addEventListener("click", () => {
+        const currentTheme = localStorage.getItem("dashboard_theme") || "dark";
+        setTheme(currentTheme === "dark" ? "light" : "dark");
+      });
+
+      // Profile Modal Handling
+      const profileModal = document.getElementById("profile-modal");
+      const openModalBtn = document.getElementById("open-profile-modal");
+      const closeModalBtn = document.getElementById("close-profile-modal");
+      const cancelModalBtn = document.getElementById("cancel-profile-btn");
+      const editProfileForm = document.getElementById("edit-profile-form");
+
+      openModalBtn.addEventListener("click", () => {
+        document.getElementById("input-name").value = user.name || "";
+        document.getElementById("input-email").value = user.email || "";
+        document.getElementById("input-profession").value =
+          user.profession || "System Administrator";
+        document.getElementById("input-initials").value = user.initials || "SA";
+        document.getElementById("input-avatar-file").value = "";
+        profileModal.classList.add("open");
+      });
+
+      function closeProfileModal() {
+        profileModal.classList.remove("open");
+      }
+
+      closeModalBtn.addEventListener("click", closeProfileModal);
+      cancelModalBtn.addEventListener("click", closeProfileModal);
+
+      profileModal.addEventListener("click", (e) => {
+        if (e.target === profileModal) closeProfileModal();
+      });
+
+      editProfileForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const fileInput = document.getElementById("input-avatar-file");
+        const saveUserData = (imageResult) => {
+          user.name = document.getElementById("input-name").value.trim();
+          user.email = document.getElementById("input-email").value.trim();
+          user.profession = document
+            .getElementById("input-profession")
+            .value.trim();
+          user.initials = document
+            .getElementById("input-initials")
+            .value.trim();
+          if (imageResult !== undefined) {
+            user.profileImage = imageResult;
+          }
+          user.role = "admin"; // Strictly locked
+
+          localStorage.setItem("currentUser", JSON.stringify(user));
+
+          let users = getUsers();
+          const idx = users.findIndex(
+            (u) => u.email === user.email || u.role === "admin"
+          );
+          if (idx !== -1) {
+            users[idx] = { ...users[idx], ...user };
+            localStorage.setItem("users_db", JSON.stringify(users));
+          }
+
+          updateProfileUI(user);
+          renderAll();
+          closeProfileModal();
+        };
+
+        if (fileInput.files && fileInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            saveUserData(event.target.result);
+          };
+          reader.readAsDataURL(fileInput.files[0]);
+        } else {
+          saveUserData();
+        }
+      });
+
+      function getUsers() {
+        const defaultUsers = [
+          {
+            name: "Kalu Marvellous",
+            email: "kalu.marvel2018@gmail.com",
+            role: "admin",
+            isRestricted: false,
+            lastActive: Date.now(),
+          },
+          {
+            name: "Bukola doe",
+            email: "bukola@gmial.com",
+            role: "consultee",
+            isRestricted: false,
+            lastActive: Date.now() - 40000,
+          },
+          {
+            name: "Klaus",
+            email: "klaus@yahoo.com",
+            role: "consultant",
+            expertise: "Business Strategy",
+            experience: 5,
+            rate: 80,
+            isRestricted: false,
+            lastActive: Date.now() - 180000,
+          },
+          {
+            name: "Bukola doe",
+            email: "bukola@yahoo.com",
+            role: "consultee",
+            isRestricted: false,
+            lastActive: Date.now() - 600000,
+          },
+        ];
+        let users = JSON.parse(localStorage.getItem("users_db"));
+        if (!users || users.length === 0) {
+          users = defaultUsers;
+          localStorage.setItem("users_db", JSON.stringify(users));
+        }
+        return users;
+      }
+
+      function saveUsers(users) {
+        localStorage.setItem("users_db", JSON.stringify(users));
+        renderAll();
+      }
+
+      function toggleAccess(email) {
+        let users = getUsers();
+        const target = users.find((u) => u.email === email);
+        if (target) {
+          target.isRestricted = !target.isRestricted;
+          saveUsers(users);
+        }
+      }
+
+      function getRealTimeStatus(u) {
+        if (u.isRestricted) {
+          return `<span class="badge badge-restricted">Restricted</span>`;
+        }
+        const diffMs = Date.now() - (u.lastActive || Date.now());
+        const diffMinutes = diffMs / (1000 * 60);
+
+        if (diffMinutes < 2) {
+          return `<span class="badge badge-active">Active</span>`;
+        } else if (diffMinutes < 10) {
+          return `<span class="badge badge-idle">Idle</span>`;
+        } else {
+          return `<span class="badge badge-idle" style="background:rgba(148,163,184,0.2);color:#94a3b8;">Offline</span>`;
+        }
+      }
+
+      function renderAll() {
+        const users = getUsers();
+        let counts = { consultee: 0, consultant: 0, admin: 0 };
+
+        const overviewTbody = document.getElementById("overview-table-body");
+        const usersTbody = document.getElementById("users-table-body");
+        const consultantsTbody = document.getElementById(
+          "consultants-table-body"
+        );
+        const consulteesTbody = document.getElementById(
+          "consultees-table-body"
+        );
+
+        overviewTbody.innerHTML = "";
+        usersTbody.innerHTML = "";
+        consultantsTbody.innerHTML = "";
+        consulteesTbody.innerHTML = "";
+
+        users.forEach((u) => {
+          if (counts[u.role] !== undefined) counts[u.role]++;
+
+          const isRestricted = u.isRestricted || false;
+          const statusBadge = getRealTimeStatus(u);
+
+          const trOverview = document.createElement("tr");
+          trOverview.innerHTML = `
+            <td><strong>${u.name}</strong></td>
+            <td>${u.email}</td>
+            <td><span class="badge badge-${u.role}">${u.role}</span></td>
+            <td>${statusBadge}</td>
+          `;
+          overviewTbody.appendChild(trOverview);
+
+          const trUser = document.createElement("tr");
+          trUser.innerHTML = `
+            <td><strong>${u.name}</strong></td>
+            <td>${u.email}</td>
+            <td><span class="badge badge-${u.role}">${u.role}</span></td>
+            <td>${statusBadge}</td>
+            <td>
+              <button class="btn-action ${
+                isRestricted ? "btn-activate" : "btn-restrict"
+              }" onclick="toggleAccess('${u.email}')">
+                ${isRestricted ? "Unrestrict" : "Restrict"}
+              </button>
+            </td>
+          `;
+          usersTbody.appendChild(trUser);
+
+          if (u.role === "consultant") {
+            const trConsultant = document.createElement("tr");
+            trConsultant.innerHTML = `
+              <td><strong>${u.name}</strong></td>
+              <td>${u.email}</td>
+              <td>${u.expertise || u.profession || "N/A"}</td>
+              <td>${u.experience ? u.experience + " Yrs" : "N/A"}</td>
+              <td>${u.rate ? "$" + u.rate + "/hr" : "N/A"}</td>
+              <td>
+                <button class="btn-action ${
+                  isRestricted ? "btn-activate" : "btn-restrict"
+                }" onclick="toggleAccess('${u.email}')">
+                  ${isRestricted ? "Unrestrict" : "Restrict"}
+                </button>
+              </td>
+            `;
+            consultantsTbody.appendChild(trConsultant);
+          }
+
+          if (u.role === "consultee") {
+            const trConsultee = document.createElement("tr");
+            trConsultee.innerHTML = `
+              <td><strong>${u.name}</strong></td>
+              <td>${u.email}</td>
+              <td>${statusBadge}</td>
+              <td>
+                <button class="btn-action ${
+                  isRestricted ? "btn-activate" : "btn-restrict"
+                }" onclick="toggleAccess('${u.email}')">
+                  ${isRestricted ? "Unrestrict" : "Restrict"}
+                </button>
+              </td>
+            `;
+            consulteesTbody.appendChild(trConsultee);
+          }
+        });
+
+        document.getElementById("metric-total").textContent = users.length;
+        document.getElementById("metric-consultees").textContent =
+          counts.consultee;
+        document.getElementById("metric-consultants").textContent =
+          counts.consultant;
+        document.getElementById("metric-admins").textContent = counts.admin;
+      }
+
+      // Tab Switching Mechanics
+      const navItems = document.querySelectorAll(".nav-item");
+      const tabPages = document.querySelectorAll(".tab-page");
+      const heading = document.getElementById("page-heading");
+
+      navItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          navItems.forEach((n) => n.classList.remove("active"));
+          tabPages.forEach((p) => p.classList.remove("active"));
+
+          item.classList.add("active");
+          const targetTab = item.getAttribute("data-tab");
+          document.getElementById(targetTab).classList.add("active");
+
+          heading.textContent = item.textContent
+            .replace(/[^\w\s]/gi, "")
+            .trim();
+
+          // Close mobile drawer on selection
+          toggleDrawer(false);
+        });
+      });
+
+      // Security Toggles Persistence
+      const settings = [
+        "setting-verify",
+        "setting-auto-restrict",
+        "setting-consultant-mandate",
+      ];
+      settings.forEach((id) => {
+        const elem = document.getElementById(id);
+        const savedVal = localStorage.getItem(id);
+        if (savedVal !== null) elem.checked = savedVal === "true";
+        elem.addEventListener("change", () =>
+          localStorage.setItem(id, elem.checked)
+        );
+      });
+
+      renderAll();
+      setInterval(renderAll, 10000);
+
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        localStorage.removeItem("currentUser");
+        window.location.href = "register.html";
+      });
+    </script>
+  </body>
+</html>
